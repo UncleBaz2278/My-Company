@@ -1,0 +1,82 @@
+import { useState } from "react";
+import { Table } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+
+export default function JobQueue() {
+  const [jobs, setJobs] = useState([
+    { id: 1, name: "ออกแบบโลโก้", date: "2025-03-10", status: "ดำเนินการ" },
+    { id: 2, name: "พัฒนาเว็บไซต์", date: "2025-03-09", status: "เสร็จแล้ว" },
+    { id: 3, name: "ตัดต่อวิดีโอ", date: "2025-03-08", status: "ดำเนินการ" },
+  ]);
+  
+  const [newJob, setNewJob] = useState("");
+  
+  const toggleStatus = (id) => {
+    setJobs((prevJobs) =>
+      prevJobs.map((job) =>
+        job.id === id
+          ? { ...job, status: job.status === "ดำเนินการ" ? "เสร็จแล้ว" : "ดำเนินการ" }
+          : job
+      )
+    );
+  };
+
+  const addJob = () => {
+    if (newJob.trim() !== "") {
+      setJobs((prevJobs) => [
+        ...prevJobs,
+        { id: prevJobs.length + 1, name: newJob, date: new Date().toISOString().split("T")[0], status: "ดำเนินการ" }
+      ]);
+      setNewJob("");
+    }
+  };
+
+  return (
+    <div className="p-6 max-w-2xl mx-auto bg-white shadow-lg rounded-lg font-['Noto Sans Thai']">
+      <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">คิวงาน</h1>
+      
+      <div className="mb-4 flex gap-2">
+        <Input 
+          className="flex-1 p-2 border rounded-lg" 
+          placeholder="เพิ่มชื่องานใหม่" 
+          value={newJob} 
+          onChange={(e) => setNewJob(e.target.value)}
+        />
+        <Button className="bg-green-500 text-white px-3 py-2 rounded-lg hover:bg-green-600" onClick={addJob}>
+          เพิ่มงาน
+        </Button>
+      </div>
+
+      <Table className="w-full border border-gray-300 rounded-lg overflow-hidden text-sm md:text-base">
+        <thead>
+          <tr className="bg-gray-200 text-gray-700">
+            <th className="p-3 border-b">ลำดับที่</th>
+            <th className="p-3 border-b">ชื่องาน</th>
+            <th className="p-3 border-b">วันที่รับงาน</th>
+            <th className="p-3 border-b">สถานะ</th>
+            <th className="p-3 border-b">จัดการ</th>
+          </tr>
+        </thead>
+        <tbody>
+          {jobs.map((job, index) => (
+            <tr key={job.id} className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}>
+              <td className="p-3 border-b text-center">{job.id}</td>
+              <td className="p-3 border-b">{job.name}</td>
+              <td className="p-3 border-b text-center">{job.date}</td>
+              <td className={`p-3 border-b text-center font-semibold ${job.status === "ดำเนินการ" ? "text-yellow-500" : "text-green-600"}`}>{job.status}</td>
+              <td className="p-3 border-b text-center">
+                <Button 
+                  className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-600"
+                  onClick={() => toggleStatus(job.id)}
+                >
+                  เปลี่ยนสถานะ
+                </Button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
+    </div>
+  );
+}
